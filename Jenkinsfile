@@ -12,9 +12,9 @@ pipeline {
         stage('Pre-Flight') {
             steps {
                 // Check Python version
-                sh 'python3 --version'
+                bat 'python --version'
                 // Check Scrapy version
-                sh 'scrapy version'
+                bat 'scrapy version'
             }
         }
         stage('Scrape Website') {
@@ -23,7 +23,7 @@ pipeline {
                     if (params.DRY_RUN) {
                         echo 'Dry run, no scraping will happen'
                     } else {
-                        sh 'scrapy crawl sandbox_spider -o sandbox.json'
+                        bat 'scrapy crawl sandbox_spider -o sandbox.json'
                     }
                 }
             }
@@ -41,20 +41,6 @@ pipeline {
             }
         }
         
-        stage('Notify') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
-            steps {
-                script {
-                    if (params.SLACK_SEND) {
-                        // Send notification to Slack
-                        slackSend channel: '#sandbox', color: 'good', message: 'Scraping completed!'
-                    }
-                }
-            }
         }
     }
 }
